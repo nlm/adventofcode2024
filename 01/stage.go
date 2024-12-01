@@ -1,70 +1,53 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
 	"io"
-	"math"
-	"regexp"
-	"slices"
+	"sort"
+	"strings"
 
-	"github.com/nlm/adventofcode2023/internal/utils"
+	"github.com/nlm/adventofcode2024/internal/iterators"
+	"github.com/nlm/adventofcode2024/internal/math"
+	"github.com/nlm/adventofcode2024/internal/utils"
 )
 
-var lineRe = regexp.MustCompile(`(\d+)\s+(\d+)`)
-
-func readAndSortLists(input io.Reader) ([]int, []int, error) {
+func readLists(input io.Reader) ([]int, []int) {
 	var (
-		list1 = make([]int, 0)
-		list2 = make([]int, 0)
+		list1 = make([]int, 0, 1024)
+		list2 = make([]int, 0, 1024)
 	)
-	s := bufio.NewScanner(input)
-	for s.Scan() {
-		items := lineRe.FindSubmatch(s.Bytes())
-		if items == nil {
-			return nil, nil, fmt.Errorf("no match")
-		}
-		list1 = append(list1, utils.MustAtoi(string(items[1])))
-		list2 = append(list2, utils.MustAtoi(string(items[2])))
+	for line := range iterators.MustLines(input) {
+		items := strings.Fields(line)
+		list1 = append(list1, utils.MustAtoi(items[0]))
+		list2 = append(list2, utils.MustAtoi(items[1]))
 	}
-	list1 = slices.Sorted(slices.Values(list1))
-	list2 = slices.Sorted(slices.Values(list2))
-	return list1, list2, nil
+	return list1, list2
 }
 
 func Stage1(input io.Reader) (any, error) {
-	list1, list2, err := readAndSortLists(input)
-	if err != nil {
-		return nil, err
-	}
+	list1, list2 := readLists(input)
+	sort.IntSlice(list1).Sort()
+	sort.IntSlice(list2).Sort()
 	total := 0
 	for i := range len(list1) {
-		total += int(math.Abs(float64(list1[i] - list2[i])))
+		total += math.Abs(list1[i] - list2[i])
 	}
 	return total, nil
 }
 
-func countAppearance(list []int, value int) int {
-	appearances := 0
+func occurrences(list []int) map[int]int {
+	occur := make(map[int]int, len(list))
 	for _, v := range list {
-		if v == value {
-			appearances++
-		}
-		if v > value {
-			break
-		}
+		occur[v]++
 	}
-	return appearances
+	return occur
 }
 
 func Stage2(input io.Reader) (any, error) {
-	list1, list2, err := readAndSortLists(input)
-	if err != nil {
-		return nil, err
-	}
+	list1, list2 := readLists(input)
+	occur := occurrences(list2)
 	total := 0
 	for i := range len(list1) {
-		total += list1[i] * countAppearance(list2, list1[i])
+		total += list1[i] * occur[list1[i]]
 	}
 	return total, nil
 }

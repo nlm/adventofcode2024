@@ -3,7 +3,7 @@ package main
 import (
 	"testing"
 
-	"github.com/nlm/adventofcode2023/internal/stage"
+	"github.com/nlm/adventofcode2024/internal/stage"
 )
 
 var Stage1TestCases = []stage.TestCase{

@@ -3,7 +3,7 @@ package main
 import (
 	"io"
 
-	"github.com/nlm/adventofcode2023/internal/stage"
+	"github.com/nlm/adventofcode2024/internal/stage"
 )
 
 func Stage1(input io.Reader) (any, error) {

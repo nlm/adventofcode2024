@@ -1,8 +1,11 @@
-module github.com/nlm/adventofcode2023
+module github.com/nlm/adventofcode2024
 
 go 1.23.3
 
-require github.com/stretchr/testify v1.7.0
+require (
+	github.com/stretchr/testify v1.10.0
+	golang.org/x/exp v0.0.0-20241108190413-2d47ceb2692f
+)
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect

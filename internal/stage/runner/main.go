@@ -5,8 +5,8 @@ import (
 	"io"
 	"plugin"
 
-	"github.com/nlm/adventofcode2023/internal/stage"
-	"github.com/nlm/adventofcode2023/internal/utils"
+	"github.com/nlm/adventofcode2024/internal/stage"
+	"github.com/nlm/adventofcode2024/internal/utils"
 )
 
 // var flagPlugin = flag.String("plugin", "", "plugin to load")

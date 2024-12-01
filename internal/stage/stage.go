@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/nlm/adventofcode2023/internal/utils"
+	"github.com/nlm/adventofcode2024/internal/utils"
 	"github.com/stretchr/testify/assert"
 )
 
