@@ -33,3 +33,11 @@ func MustLines(r io.Reader) iter.Seq[string] {
 		}
 	}
 }
+
+func Map[T1, T2 any](items []T1, f func(T1) T2) []T2 {
+	result := make([]T2, len(items))
+	for i := range len(items) {
+		result[i] = f(items[i])
+	}
+	return result
+}
