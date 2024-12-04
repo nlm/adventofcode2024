@@ -11,7 +11,7 @@ import (
 func SearchXmas(m *matrix.Matrix[byte], orig matrix.Coord, dir matrix.Vec) int {
 	word := []byte{'X', 'M', 'A', 'S'}
 	for i := range len(word) {
-		curr := orig.Add(matrix.Vec{X: dir.X * i, Y: dir.Y * i})
+		curr := orig.Add(dir.Mul(i))
 		if !m.InCoord(curr) {
 			// stage.Println("out of bounds")
 			return 0
@@ -27,29 +27,30 @@ func SearchXmas(m *matrix.Matrix[byte], orig matrix.Coord, dir matrix.Vec) int {
 func Stage1(input io.Reader) (any, error) {
 	total := 0
 	m := utils.Must(matrix.NewFromReader(input))
-	for y := 0; y < m.Len.Y; y++ {
-		for x := 0; x < m.Len.X; x++ {
-			if m.At(x, y) != 'X' {
-				continue
-			}
-			stage.Println("Search", x, y)
-			coord := matrix.Coord{X: x, Y: y}
+	for coord := range m.IterCoords() {
+		if m.AtCoord(coord) != 'X' {
+			continue
+		}
+		stage.Println("Search", coord)
+		for _, vec := range []matrix.Vec{
 			// Clock 12
-			total += SearchXmas(m, coord, matrix.Vec{X: 0, Y: 1})
+			matrix.Up,
 			// Clock 1.5
-			total += SearchXmas(m, coord, matrix.Vec{X: 1, Y: 1})
+			matrix.UpRight,
 			// Clock 3
-			total += SearchXmas(m, coord, matrix.Vec{X: 1, Y: 0})
+			matrix.Right,
 			// Clock 4.5
-			total += SearchXmas(m, coord, matrix.Vec{X: 1, Y: -1})
+			matrix.DownRight,
 			// CLock 6
-			total += SearchXmas(m, coord, matrix.Vec{X: 0, Y: -1})
+			matrix.Down,
 			// Clock 7.5
-			total += SearchXmas(m, coord, matrix.Vec{X: -1, Y: -1})
+			matrix.DownLeft,
 			// Clock 9
-			total += SearchXmas(m, coord, matrix.Vec{X: -1, Y: 0})
+			matrix.Left,
 			// Clock 10.5
-			total += SearchXmas(m, coord, matrix.Vec{X: -1, Y: 1})
+			matrix.UpLeft,
+		} {
+			total += SearchXmas(m, coord, vec)
 		}
 	}
 	return total, nil
@@ -57,10 +58,10 @@ func Stage1(input io.Reader) (any, error) {
 
 func SearchCrossMass(m *matrix.Matrix[byte], orig matrix.Coord) int {
 	vecs := []matrix.Vec{
-		{X: -1, Y: -1},
-		{X: -1, Y: 1},
-		{X: 1, Y: 1},
-		{X: 1, Y: -1},
+		matrix.UpLeft,
+		matrix.UpRight,
+		matrix.DownLeft,
+		matrix.DownRight,
 	}
 	xs := map[byte]int{'M': 0, 'S': 0}
 	for _, v := range vecs {
@@ -75,7 +76,7 @@ func SearchCrossMass(m *matrix.Matrix[byte], orig matrix.Coord) int {
 		return 0
 	}
 	// MAM / SAS
-	if m.AtCoord(orig.Add(matrix.Vec{X: -1, Y: -1})) == m.AtCoord(orig.Add(matrix.Vec{X: 1, Y: 1})) {
+	if m.AtCoord(orig.Add(matrix.UpLeft)) == m.AtCoord(orig.Add(matrix.DownRight)) {
 		return 0
 	}
 	return 1
@@ -84,15 +85,12 @@ func SearchCrossMass(m *matrix.Matrix[byte], orig matrix.Coord) int {
 func Stage2(input io.Reader) (any, error) {
 	total := 0
 	m := utils.Must(matrix.NewFromReader(input))
-	for y := 0; y < m.Len.Y; y++ {
-		for x := 0; x < m.Len.X; x++ {
-			if m.At(x, y) != 'A' {
-				continue
-			}
-			stage.Println("Search", x, y)
-			coord := matrix.Coord{X: x, Y: y}
-			total += SearchCrossMass(m, coord)
+	for coord := range m.IterCoords() {
+		if m.AtCoord(coord) != 'A' {
+			continue
 		}
+		stage.Println("Search", coord)
+		total += SearchCrossMass(m, coord)
 	}
 	return total, nil
 }

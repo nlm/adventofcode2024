@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"iter"
 	"strings"
 )
 
@@ -72,6 +73,18 @@ func (m *Matrix[T]) Find(value T) (Coord, bool) {
 func (m *Matrix[T]) Fill(value T) {
 	for i := 0; i < len(m.Data); i++ {
 		m.Data[i] = value
+	}
+}
+
+func (m *Matrix[T]) IterCoords() iter.Seq[Coord] {
+	return func(yield func(Coord) bool) {
+		for y := 0; y < m.Len.Y; y++ {
+			for x := 0; x < m.Len.X; x++ {
+				if !yield(Coord{X: x, Y: y}) {
+					return
+				}
+			}
+		}
 	}
 }
 
