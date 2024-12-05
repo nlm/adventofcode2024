@@ -7,17 +7,18 @@ import (
 	"slices"
 	"strings"
 
+	"github.com/nlm/adventofcode2024/internal/sets"
 	"github.com/nlm/adventofcode2024/internal/stage"
 	"github.com/nlm/adventofcode2024/internal/utils"
 )
 
-func ReadRequirements(s *bufio.Scanner) map[string][]string {
-	requirements := make(map[string][]string, 0)
+func ReadRequirements(s *bufio.Scanner) map[string]sets.Set[string] {
+	requirements := make(map[string]sets.Set[string], 0)
 	for s.Scan() {
 		line := s.Text()
-		// Section separator
+
+		// Detect section separator
 		if strings.TrimSpace(line) == "" {
-			stage.Println("break")
 			break
 		}
 		// Read ordering rules
@@ -26,7 +27,7 @@ func ReadRequirements(s *bufio.Scanner) map[string][]string {
 			panic(fmt.Errorf("malformed line: %v", line))
 		}
 		// requiredments[PAGE] = all pages that must already be printed
-		requirements[parts[1]] = append(requirements[parts[1]], parts[0])
+		requirements[parts[1]] = sets.Append(requirements[parts[1]], parts[0])
 	}
 	stage.Println(requirements)
 	return requirements
@@ -36,59 +37,60 @@ func ReadUpdates(s *bufio.Scanner) [][]string {
 	updates := make([][]string, 0)
 	for s.Scan() {
 		line := s.Text()
-		stage.Println(line)
 		// Read pages to print
 		updates = append(updates, strings.Split(line, ","))
 	}
-	stage.Println(updates)
+	// stage.Println(updates)
 	return updates
 }
 
-func ReportIsOrdered(pages []string, requirements map[string][]string) bool {
-	stage.Println("== printing update:", pages, "==")
-	alreadyPrinted := make([]string, 0, len(pages))
+func ReportIsOrdered(pages []string, requirements map[string]sets.Set[string]) bool {
+	// stage.Println("== printing update:", pages, "==")
+	allPages := sets.Append(nil, pages...)
+	alreadyPrinted := make(sets.Set[string], len(pages))
 	updateOk := true
 	for _, page := range pages {
-		stage.Println("printing page", page)
+		// stage.Println("printing page", page)
 
 		// this page is now printed
-		alreadyPrinted = append(alreadyPrinted, page)
+		alreadyPrinted.Add(page)
 
 		// checkint requirements
 		pageOk := true
 		requirements, ok := requirements[page]
 		if !ok {
 			// no requirements found
-			stage.Println("no requirements")
+			// stage.Println("no requirements")
 			continue
 		}
-		for _, requiredPage := range requirements {
-			stage.Println(" page", page, "requires", requiredPage)
-			// requiredment not part of the update
-			if !slices.Contains(pages, requiredPage) {
-				stage.Println("  which is not part of the update")
+		for requiredPage := range sets.Values(requirements) {
+			// stage.Print("  page ", page, " requires ", requiredPage)
+			// requirement not part of the update
+			if !allPages.Contains(requiredPage) {
+				// stage.Println(" which is not part of the update: ignore")
 				continue
 			}
-			if !slices.Contains(alreadyPrinted, requiredPage) {
-				stage.Println("  which is not yet printed: error")
+			// requirement not yet printed
+			if !alreadyPrinted.Contains(requiredPage) {
+				// stage.Println(" which is not yet printed: error")
 				pageOk = false
 				break
 			}
-			stage.Println("  requirement ok", requiredPage)
+			// stage.Println(" which is printed: ok")
 		}
 		if pageOk {
-			stage.Println("=> page is OK")
+			// stage.Println("  page is OK")
 		} else {
+			// stage.Println("  page is BAD")
 			updateOk = false
-			stage.Println("=> page is BAD")
 			break
 		}
 	}
-	if updateOk {
-		stage.Println("=> report is OK")
-	} else {
-		stage.Println("=> report is BAD")
-	}
+	// if updateOk {
+	// 	stage.Println("=> update is OK")
+	// } else {
+	// 	stage.Println("=> update is BAD")
+	// }
 	return updateOk
 }
 
@@ -112,9 +114,9 @@ func Stage1(input io.Reader) (any, error) {
 	return total, nil
 }
 
-func ReorderPages(pages []string, requirements map[string][]string) []string {
+func ReorderPages(pages []string, requirements map[string]sets.Set[string]) []string {
 	return slices.SortedStableFunc(slices.Values(pages), func(a, b string) int {
-		if slices.Contains(requirements[b], a) {
+		if requirements[b].Contains(a) {
 			return -1
 		}
 		return 0
@@ -137,9 +139,9 @@ func Stage2(input io.Reader) (any, error) {
 			// report already ok, skip
 			continue
 		}
-		stage.Println("before:", pages)
+		// stage.Println("before:", pages)
 		pages = ReorderPages(pages, requirements)
-		stage.Println("after:", pages)
+		// stage.Println("after:", pages)
 		middlePage := pages[len(pages)/2]
 		total += utils.MustAtoi(middlePage)
 	}

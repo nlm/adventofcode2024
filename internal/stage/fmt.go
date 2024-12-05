@@ -15,3 +15,10 @@ func Printf(format string, a ...any) (n int, err error) {
 	}
 	return 0, nil
 }
+
+func Print(a ...any) (n int, err error) {
+	if Verbose() {
+		return fmt.Print(a...)
+	}
+	return 0, nil
+}
