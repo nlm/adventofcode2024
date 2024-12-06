@@ -70,6 +70,16 @@ func (m *Matrix[T]) Find(value T) (Coord, bool) {
 	return Coord{}, false
 }
 
+func (m *Matrix[T]) Count(value T) int {
+	count := 0
+	for _, v := range m.Data {
+		if v == value {
+			count++
+		}
+	}
+	return count
+}
+
 func (m *Matrix[T]) Fill(value T) {
 	for i := 0; i < len(m.Data); i++ {
 		m.Data[i] = value

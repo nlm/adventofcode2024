@@ -37,3 +37,13 @@ func TestAt(t *testing.T) {
 		})
 	}
 }
+
+func BenchmarkMatrix(b *testing.B) {
+	for range b.N {
+		m := New[byte](100, 100)
+		m.Fill('X')
+		for c := range m.IterCoords() {
+			assert.Equal(b, byte('X'), m.AtCoord(c))
+		}
+	}
+}
