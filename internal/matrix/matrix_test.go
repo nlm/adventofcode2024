@@ -38,11 +38,22 @@ func TestAt(t *testing.T) {
 	}
 }
 
+func TestCopy(t *testing.T) {
+	m1 := New[int](2, 2)
+	m2 := New[int](2, 2)
+	assert.Equal(t, []int{0, 0, 0, 0}, m1.Data)
+	assert.Equal(t, []int{0, 0, 0, 0}, m2.Data)
+	m1.Fill(1)
+	assert.Equal(t, []int{1, 1, 1, 1}, m1.Data)
+	m2.Copy(m1)
+	assert.Equal(t, []int{1, 1, 1, 1}, m2.Data)
+}
+
 func BenchmarkMatrix(b *testing.B) {
 	for range b.N {
 		m := New[byte](100, 100)
 		m.Fill('X')
-		for c := range m.IterCoords() {
+		for c := range m.Coords() {
 			assert.Equal(b, byte('X'), m.AtCoord(c))
 		}
 	}
