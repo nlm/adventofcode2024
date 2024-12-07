@@ -21,6 +21,13 @@ func MustAtoi(s string) int {
 	return Must(strconv.Atoi(strings.TrimSpace(s)))
 }
 
+// NoError panics if an error is present
+func MustNoErr(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
 // Map returns a new slice of the same size as t1,
 // containing the result of fn applied on each value of t1.
 func Map[T1, T2 any](t1 []T1, fn func(T1) T2) []T2 {

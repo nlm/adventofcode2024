@@ -27,7 +27,7 @@ func SearchXmas(m *matrix.Matrix[byte], orig matrix.Coord, dir matrix.Vec) bool 
 func Stage1(input io.Reader) (any, error) {
 	total := 0
 	m := utils.Must(matrix.NewFromReader(input))
-	for coord := range m.IterCoords() {
+	for coord := range m.Coords() {
 		// XMAS always starts with an X
 		if m.AtCoord(coord) != 'X' {
 			continue
@@ -89,7 +89,7 @@ func SearchCrossMass(m *matrix.Matrix[byte], orig matrix.Coord) bool {
 func Stage2(input io.Reader) (any, error) {
 	total := 0
 	m := utils.Must(matrix.NewFromReader(input))
-	for coord := range m.IterCoords() {
+	for coord := range m.Coords() {
 		// We want to look around A
 		if m.AtCoord(coord) != 'A' {
 			continue

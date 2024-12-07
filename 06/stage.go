@@ -42,8 +42,11 @@ func Stage1(input io.Reader) (any, error) {
 	return total, nil
 }
 
+// var visits = make(map[matrix.Coord][]matrix.Vec, 1024)
+
 func DetectLoop(m *matrix.Matrix[byte], orig matrix.Coord, dir matrix.Vec) bool {
-	visits := make(map[matrix.Coord][]matrix.Vec)
+	visits := make(map[matrix.Coord][]matrix.Vec, len(m.Data))
+	// clear(visits)
 	curr := orig
 	for {
 		m.SetAtCoord(curr, 'X')
@@ -69,12 +72,14 @@ func Stage2(input io.Reader) (any, error) {
 	origin, _ := m.Find('^')
 	dir := matrix.Up
 	total := 0
-	for coord := range m.IterCoords() {
+	m2 := matrix.New[byte](m.Len.X, m.Len.Y)
+	for coord := range m.Coords() {
 		if m.AtCoord(coord) == '#' {
 			// can't place obstacle on a wall
 			continue
 		}
-		m2 := m.Clone()
+		// Create a work copy
+		utils.MustNoErr(m2.Copy(m))
 		// Set obstacle
 		m2.SetAtCoord(coord, 'O')
 		if DetectLoop(m2, origin, dir) {
