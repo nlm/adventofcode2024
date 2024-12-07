@@ -48,14 +48,15 @@ func BenchmarkConcat(b *testing.B) {
 	})
 }
 
-func BenchmarkProduct1(b *testing.B) {
+func BenchmarkCartesianProduct(b *testing.B) {
 	for range b.N {
-		slices.Collect(CarthesianProduct([]Op{Add, Mul, Concat}, 10))
+		for range CartesianProduct([]Op{Add, Mul, Concat}, 4) {
+		}
 	}
 }
 
 func TestCarthesianProduct(t *testing.T) {
-	result := slices.Collect(CarthesianProduct([]string{"A", "B", "C"}, 2))
+	result := slices.Collect(CartesianProduct([]string{"A", "B", "C"}, 2))
 	expected := [][]string{
 		{"A", "A"},
 		{"A", "B"},
@@ -68,4 +69,12 @@ func TestCarthesianProduct(t *testing.T) {
 		{"C", "C"},
 	}
 	assert.Equal(t, result, expected)
+}
+
+func BenchmarkSolver(b *testing.B) {
+	eq := ParseEquation("20887367880: 9 2 9 541 9 1 3 5 7 8 355")
+	s := Solver{Operators: []Op{Add, Mul}}
+	for range b.N {
+		s.Solve(eq)
+	}
 }
