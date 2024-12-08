@@ -41,3 +41,7 @@ func (c *Coord) Move(v Vec) {
 	c.X += v.X
 	c.Y += v.Y
 }
+
+func (c Coord) Sub(c2 Coord) Vec {
+	return Vec{c.X - c2.X, c.Y - c2.Y}
+}
