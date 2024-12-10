@@ -6,6 +6,7 @@ import (
 	"io"
 	"iter"
 	"math"
+	"slices"
 	"strings"
 
 	"github.com/nlm/adventofcode2024/internal/iterators"
@@ -25,7 +26,7 @@ func ParseEquation(line string) Equation {
 	elts := strings.Fields(line)
 	return Equation{
 		Result: utils.MustAtoi(strings.Replace(elts[0], ":", "", 1)),
-		Parts:  iterators.Map(elts[1:], utils.MustAtoi),
+		Parts:  slices.Collect(iterators.Map(slices.Values(elts[1:]), utils.MustAtoi)),
 	}
 }
 
