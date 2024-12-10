@@ -15,6 +15,7 @@ import (
 
 	"github.com/nlm/adventofcode2024/internal/utils"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var flagStage = flag.Uint("stage", 1, "stage to run")
@@ -121,7 +122,15 @@ func Test(t *testing.T, fn StageFunc, cases []TestCase) {
 	for _, tc := range cases {
 		t.Run(tc.Name, func(t *testing.T) {
 			if tc.Input == nil {
-				tc.Input = Open(tc.Name + ".txt")
+				var err error
+				tc.Input, err = stageFS.Open(tc.Name + ".txt")
+				if err != nil {
+					if tc.Name == "input" {
+						// we're not commiting input.txt to the repo
+						t.SkipNow()
+					}
+					require.NoError(t, err)
+				}
 			}
 			reader, err := Reader(tc.Input)
 			if !assert.NoError(t, err) {
