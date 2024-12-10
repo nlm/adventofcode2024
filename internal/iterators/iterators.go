@@ -34,10 +34,24 @@ func MustLines(r io.Reader) iter.Seq[string] {
 	}
 }
 
-func Map[T1, T2 any](items []T1, f func(T1) T2) []T2 {
-	result := make([]T2, len(items))
-	for i := range len(items) {
-		result[i] = f(items[i])
+func Map[T1, T2 any](items iter.Seq[T1], f func(T1) T2) iter.Seq[T2] {
+	return func(yield func(T2) bool) {
+		for item := range items {
+			if !yield(f(item)) {
+				return
+			}
+		}
 	}
-	return result
+}
+
+func Filter[T1 any](items iter.Seq[T1], f func(T1) bool) iter.Seq[T1] {
+	return func(yield func(T1) bool) {
+		for item := range items {
+			if f(item) {
+				if !yield(item) {
+					return
+				}
+			}
+		}
+	}
 }
