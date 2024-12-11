@@ -65,7 +65,7 @@ func reportIsSafe(items []int) bool {
 func Stage1(input io.Reader) (any, error) {
 	total := 0
 	for line := range iterators.MustLines(input) {
-		items := iterators.Map(strings.Fields(line), utils.MustAtoi)
+		items := iterators.MapSlice(strings.Fields(line), utils.MustAtoi)
 		if reportIsSafe(items) {
 			total++
 		}
@@ -89,7 +89,7 @@ func eachReportMinusOne(items []int) iter.Seq[[]int] {
 func Stage2(input io.Reader) (any, error) {
 	total := 0
 	for line := range iterators.MustLines(input) {
-		items := iterators.Map(strings.Fields(line), utils.MustAtoi)
+		items := iterators.MapSlice(strings.Fields(line), utils.MustAtoi)
 		for report := range eachReportMinusOne(items) {
 			if reportIsSafe(report) {
 				total++

@@ -44,6 +44,14 @@ func Map[T1, T2 any](items iter.Seq[T1], f func(T1) T2) iter.Seq[T2] {
 	}
 }
 
+func MapSlice[T1, T2 any](items []T1, f func(T1) T2) []T2 {
+	res := make([]T2, len(items))
+	for i := range len(items) {
+		res[i] = f(items[i])
+	}
+	return res
+}
+
 func Filter[T1 any](items iter.Seq[T1], f func(T1) bool) iter.Seq[T1] {
 	return func(yield func(T1) bool) {
 		for item := range items {
@@ -54,4 +62,14 @@ func Filter[T1 any](items iter.Seq[T1], f func(T1) bool) iter.Seq[T1] {
 			}
 		}
 	}
+}
+
+func FilterSlice[T1 any](items []T1, f func(T1) bool) []T1 {
+	res := make([]T1, 0, len(items))
+	for _, item := range items {
+		if f(item) {
+			res = append(res, item)
+		}
+	}
+	return res
 }

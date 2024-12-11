@@ -15,7 +15,7 @@ func Stage1(input io.Reader) (any, error) {
 	for line := range iterators.MustLines(input) {
 		for _, match := range re.FindAllString(line, -1) {
 			stage.Println("match:", match)
-			n := iterators.Map(re.FindStringSubmatch(match)[1:], utils.MustAtoi)
+			n := iterators.MapSlice(re.FindStringSubmatch(match)[1:], utils.MustAtoi)
 			total += n[0] * n[1]
 		}
 	}
@@ -36,7 +36,7 @@ func Stage2(input io.Reader) (any, error) {
 				enabled = false
 			default:
 				if enabled {
-					n := iterators.Map(re.FindStringSubmatch(match)[1:], utils.MustAtoi)
+					n := iterators.MapSlice(re.FindStringSubmatch(match)[1:], utils.MustAtoi)
 					total += n[0] * n[1]
 				}
 			}
