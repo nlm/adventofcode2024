@@ -4,10 +4,12 @@ import (
 	"fmt"
 )
 
-type Coord struct {
+type XY struct {
 	X int
 	Y int
 }
+
+type Coord XY
 
 func (c Coord) Left() Coord {
 	return c.Add(Left)

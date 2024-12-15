@@ -10,7 +10,7 @@ import (
 
 type Matrix[T comparable] struct {
 	Data []T
-	Len  Coord
+	Size Vec
 }
 
 func (m *Matrix[T]) Clone() *Matrix[T] {
@@ -18,7 +18,7 @@ func (m *Matrix[T]) Clone() *Matrix[T] {
 	copy(data, m.Data)
 	return &Matrix[T]{
 		Data: data,
-		Len:  m.Len,
+		Size: m.Size,
 	}
 }
 
@@ -28,7 +28,7 @@ var ErrInconsistentGeometry = fmt.Errorf("inconsistent geometry")
 func New[T comparable](x, y int) *Matrix[T] {
 	return &Matrix[T]{
 		Data: make([]T, x*y),
-		Len:  Coord{x, y},
+		Size: Vec{x, y},
 	}
 }
 
@@ -54,8 +54,8 @@ func NewFromReader(input io.Reader) (*Matrix[byte], error) {
 	if s.Err() != nil {
 		return nil, s.Err()
 	}
-	matrix.Len.X = cols
-	matrix.Len.Y = rows
+	matrix.Size.X = cols
+	matrix.Size.Y = rows
 	return matrix, nil
 }
 
@@ -72,7 +72,7 @@ func NewFromReader(input io.Reader) (*Matrix[byte], error) {
 func (m *Matrix[T]) Find(value T) (Coord, bool) {
 	for i := 0; i < len(m.Data); i++ {
 		if m.Data[i] == value {
-			return Coord{i % m.Len.X, i / m.Len.X}, true
+			return Coord{i % m.Size.X, i / m.Size.X}, true
 		}
 	}
 	return Coord{}, false
@@ -99,7 +99,7 @@ func (m *Matrix[T]) Fill(value T) {
 // Copy copies data from a matrix into the current matrix.
 // If geometries are different, an error will be returned.
 func (m *Matrix[T]) Copy(src *Matrix[T]) error {
-	if src.Len != m.Len {
+	if src.Size != m.Size {
 		return ErrInconsistentGeometry
 	}
 	copy(m.Data, src.Data)
@@ -110,8 +110,8 @@ func (m *Matrix[T]) Copy(src *Matrix[T]) error {
 // that exist in the matrix.
 func (m *Matrix[T]) Coords() iter.Seq[Coord] {
 	return func(yield func(Coord) bool) {
-		for y := 0; y < m.Len.Y; y++ {
-			for x := 0; x < m.Len.X; x++ {
+		for y := 0; y < m.Size.Y; y++ {
+			for x := 0; x < m.Size.X; x++ {
 				if !yield(Coord{X: x, Y: y}) {
 					return
 				}
@@ -153,14 +153,14 @@ func (m *Matrix[T]) AtCoord(c Coord) T {
 // It's the responsibility of the user to check that
 // the coordinate exists within the Matrix with In.
 func (m *Matrix[T]) At(x, y int) T {
-	return m.Data[y*m.Len.X+x]
+	return m.Data[y*m.Size.X+x]
 }
 
 // SetAt sets the value present at a coordinate.
 // It's the responsibility of the user to check that
 // the coordinate exists within the Matrix with In.
 func (m *Matrix[T]) SetAt(x, y int, value T) {
-	m.Data[y*m.Len.X+x] = value
+	m.Data[y*m.Size.X+x] = value
 }
 
 // SetAtCoord sets the value present at a coordinate.
@@ -172,7 +172,7 @@ func (m *Matrix[T]) SetAtCoord(c Coord, value T) {
 
 // In checks that a coordinate exists within the Matrix.
 func (m *Matrix[T]) In(x, y int) bool {
-	return x >= 0 && x <= m.Len.X-1 && y >= 0 && y <= m.Len.Y-1
+	return x >= 0 && x <= m.Size.X-1 && y >= 0 && y <= m.Size.Y-1
 }
 
 // InCoord checks that a coordinate exists within the Matrix.
@@ -182,8 +182,8 @@ func (m *Matrix[T]) InCoord(c Coord) bool {
 
 func SMatrix(m *Matrix[byte]) string {
 	sb := strings.Builder{}
-	for y := 0; y < m.Len.Y; y++ {
-		sb.Write(m.Data[y*m.Len.X : (y+1)*m.Len.X])
+	for y := 0; y < m.Size.Y; y++ {
+		sb.Write(m.Data[y*m.Size.X : (y+1)*m.Size.X])
 		sb.WriteByte('\n')
 	}
 	return sb.String()
@@ -191,8 +191,8 @@ func SMatrix(m *Matrix[byte]) string {
 
 func (m *Matrix[T]) String() string {
 	sb := strings.Builder{}
-	for y := 0; y < m.Len.Y; y++ {
-		fmt.Fprint(&sb, m.Data[y*m.Len.X:(y+1)*m.Len.X])
+	for y := 0; y < m.Size.Y; y++ {
+		fmt.Fprint(&sb, m.Data[y*m.Size.X:(y+1)*m.Size.X])
 		sb.WriteByte('\n')
 	}
 	return sb.String()

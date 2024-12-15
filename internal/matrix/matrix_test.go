@@ -9,7 +9,7 @@ import (
 func TestNew(t *testing.T) {
 	m := New[byte](4, 2)
 	assert.Len(t, m.Data, 4*2)
-	assert.Equal(t, m.Len, Coord{4, 2})
+	assert.Equal(t, m.Size, Vec{4, 2})
 }
 
 func TestAt(t *testing.T) {

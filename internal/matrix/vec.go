@@ -2,17 +2,13 @@ package matrix
 
 import "fmt"
 
-type Vec struct {
-	X int
-	Y int
-}
+type Vec XY
 
 var (
 	Left      = Vec{X: -1, Y: 0}
 	Right     = Vec{X: 1, Y: 0}
 	Up        = Vec{X: 0, Y: -1}
 	Down      = Vec{X: 0, Y: 1}
-	Down2     = Vec{0, 1}
 	UpLeft    = Up.Add(Left)
 	UpRight   = Up.Add(Right)
 	DownLeft  = Down.Add(Left)
@@ -32,4 +28,9 @@ func (v Vec) Mul(n int) Vec {
 // String returns a string representation of Vec.
 func (v Vec) String() string {
 	return fmt.Sprintf("{X: %d, Y: %d}", v.X, v.Y)
+}
+
+// Inv returns the inverse of this vector
+func (v Vec) Inv() Vec {
+	return Vec{X: -v.X, Y: -v.Y}
 }

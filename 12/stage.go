@@ -35,7 +35,7 @@ func Visit(m *matrix.Matrix[byte], c matrix.Coord, visited *matrix.Matrix[bool])
 
 func Stage1(input io.Reader) (any, error) {
 	m := utils.Must(matrix.NewFromReader(input))
-	visited := matrix.New[bool](m.Len.X, m.Len.Y)
+	visited := matrix.New[bool](m.Size.X, m.Size.Y)
 	total := 0
 	for c := range m.Coords() {
 		if visited.AtCoord(c) {
@@ -93,7 +93,7 @@ func VisitWithCorners(m *matrix.Matrix[byte], c matrix.Coord, visited *matrix.Ma
 
 func Stage2(input io.Reader) (any, error) {
 	m := utils.Must(matrix.NewFromReader(input))
-	visited := matrix.New[bool](m.Len.X, m.Len.Y)
+	visited := matrix.New[bool](m.Size.X, m.Size.Y)
 	total := 0
 	stage.Println(matrix.SMatrix(m))
 	for c := range m.Coords() {

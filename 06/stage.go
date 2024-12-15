@@ -72,7 +72,7 @@ func Stage2(input io.Reader) (any, error) {
 	origin, _ := m.Find('^')
 	dir := matrix.Up
 	total := 0
-	m2 := matrix.New[byte](m.Len.X, m.Len.Y)
+	m2 := matrix.New[byte](m.Size.X, m.Size.Y)
 	for coord := range m.Coords() {
 		if m.AtCoord(coord) == '#' {
 			// can't place obstacle on a wall
