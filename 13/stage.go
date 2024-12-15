@@ -116,7 +116,19 @@ func Solve2(m Machine) (bool, int64) {
 // (Ax * a) + (Bx * b) = Px
 // (Ay * a) + (By * b) = Py
 //
-// (Ax * a) + (Bx * b) = Px
+// (Ax * a) + (Bx * b) = Tx
+// (Ay * a) + (By * b) = Ty
+//
+// a = (Tx - (Bx * b)) / Ax
+// a = (Ty - (By * b)) / Ay
+//
+// (Tx - (Bx * b)) / Ax = (Ty - (By * b)) / Ay
+// (Tx - (Bx * b)) * Ay = ((Ty - (By * b)) * Ax)
+// (Tx * Ay) - (Bx * b * Ay) = (Ty * Ax) - (By * b * Ax)
+// (By * b * Ax) - (Bx * b * Ay) = (Ty * Ax) - (Tx * Ay)
+// b = (Ty * Ax) - (Tx * Ay) / ((By * Ax) - (Bx * Ay))
+
+// a = (Ty * Ax) - (Tx * Ay) / ((By * Ax) - (Bx * Ay))
 
 func Stage2(input io.Reader) (any, error) {
 	machines, err := ParseInput(input)

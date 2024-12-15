@@ -66,14 +66,20 @@ func Quadrants(lenX, lenY int) iter.Seq2[matrix.Coord, matrix.Coord] {
 	vecY := matrix.Vec{X: 0, Y: lenY/2 - 1}
 	orig := matrix.Coord{X: 0, Y: 0}
 	return func(yield func(matrix.Coord, matrix.Coord) bool) {
-		// UpLeft
-		yield(orig, orig.Add(vecX).Add(vecY))
-		// UpRight
-		yield(orig.Add(vecX).Add(matrix.Vec{X: 2}), orig.Add(vecX).Add(matrix.Vec{X: 2}).Add(vecX).Add(vecY))
-		// DownLeft
-		yield(orig.Add(vecY).Add(matrix.Vec{Y: 2}), orig.Add(vecY).Add(matrix.Vec{Y: 2}).Add(vecX).Add(vecY))
-		// DownRight
-		yield(orig.Add(vecX).Add(vecY).Add(matrix.Vec{X: 2, Y: 2}), orig.Add(vecX).Add(vecY).Add(matrix.Vec{X: 2, Y: 2}).Add(vecX).Add(vecY))
+		for _, v := range [][2]matrix.Coord{
+			// UpLeft
+			{orig, orig.Add(vecX).Add(vecY)},
+			// UpRight
+			{orig.Add(vecX).Add(matrix.Vec{X: 2}), orig.Add(vecX).Add(matrix.Vec{X: 2}).Add(vecX).Add(vecY)},
+			// DownLeft
+			{orig.Add(vecY).Add(matrix.Vec{Y: 2}), orig.Add(vecY).Add(matrix.Vec{Y: 2}).Add(vecX).Add(vecY)},
+			// DownRight
+			{orig.Add(vecX).Add(vecY).Add(matrix.Vec{X: 2, Y: 2}), orig.Add(vecX).Add(vecY).Add(matrix.Vec{X: 2, Y: 2}).Add(vecX).Add(vecY)},
+		} {
+			if !yield(v[0], v[1]) {
+				return
+			}
+		}
 	}
 }
 

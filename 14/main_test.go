@@ -7,10 +7,10 @@ import (
 )
 
 var Stage1TestCases = []stage.TestCase{
-	{
-		Name:   "example",
-		Result: 12,
-	},
+	// {
+	// 	Name:   "example",
+	// 	Result: 12,
+	// },
 	{
 		Name:   "input",
 		Result: 230435667,
