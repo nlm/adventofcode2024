@@ -15,6 +15,17 @@ var (
 	DownRight = Down.Add(Right)
 )
 
+var VecName = map[Vec]string{
+	Left:      "Left",
+	Right:     "Right",
+	Up:        "Up",
+	Down:      "Down",
+	UpLeft:    "UpLeft",
+	UpRight:   "UpRight",
+	DownLeft:  "DownLeft",
+	DownRight: "DownRight",
+}
+
 // Add adds a vector to another vector.
 func (v Vec) Add(v2 Vec) Vec {
 	return Vec{X: v.X + v2.X, Y: v.Y + v2.Y}
