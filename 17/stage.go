@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"maps"
 	"math"
 	"regexp"
 	"slices"
@@ -23,11 +24,12 @@ type Computer struct {
 	outInt []int
 }
 
-func (cmp *Computer) Clear() {
+func (cmp *Computer) Reset() {
 	cmp.IP = 0
-	for _, b := range []byte{'A', 'B', 'C'} {
-		cmp.Rg[b] = cmp.InitRg[b]
-	}
+	maps.Copy(cmp.Rg, cmp.InitRg)
+	// for _, b := range []byte{'A', 'B', 'C'} {
+	// 	cmp.Rg[b] = cmp.InitRg[b]
+	// }
 	cmp.outInt = cmp.outInt[:0]
 	cmp.output = cmp.output[:0]
 }
@@ -113,18 +115,16 @@ func (cp *Computer) Step() bool {
 func (cp *Computer) Output(v int) {
 	cp.output = append(cp.output, fmt.Sprint(v))
 	cp.outInt = append(cp.outInt, v)
-	// fmt.Print(v, ",")
+	// stage.Println("Out:", v)
 }
 
 func Stage1(input io.Reader) (any, error) {
 	cmp := ParseInput(input)
 	stage.Println(cmp)
 	for cmp.Step() {
-
 	}
 	stage.Println(cmp)
-	stage.Println(strings.Join(cmp.output, ","))
-	return 0, nil
+	return strings.Join(cmp.output, ","), nil
 }
 
 const MaxUint = ^uint(0)
@@ -133,11 +133,7 @@ const MaxInt = int(MaxUint >> 1)
 const MinInt = -MaxInt - 1
 
 func Stage2(input io.Reader) (any, error) {
-	// 164541002416128
-	// 164545925312189
-	// 164541017976509
 	cmp := ParseInput(input)
-	// stage.Println(cmp)
 	var i = 0
 	go func() {
 		for {
@@ -145,30 +141,50 @@ func Stage2(input io.Reader) (any, error) {
 			time.Sleep(1 * time.Second)
 		}
 	}()
-	n := 16
-	// for i = 40000000000000; i < MaxInt; i += 10000000 {
-	// for i = 164541002416100; i < MaxInt; i += 10 {
-	for i = 164541017972735; i < MaxInt; i += 1 {
-		// fmt.Println(i)
-		cmp.Clear()
+	// Try to match size quickly
+	for ; i < MaxInt; i++ {
+		cmp.Reset()
 		cmp.Rg['A'] = i
-		// stage.Println(cmp)
 		for cmp.Step() {
 		}
 		stage.Println("prog", cmp.Prog, "out", cmp.outInt)
-		if len(cmp.outInt) != len(cmp.Prog) {
-			i += 10000000
+		if len(cmp.outInt) < len(cmp.Prog) {
+			i *= 2
 			continue
 		}
-		if slices.Compare(cmp.Prog[len(cmp.Prog)-n:], cmp.outInt[len(cmp.outInt)-n:]) == 0 {
-			return i, nil
-		}
-		if slices.Compare(cmp.Prog, cmp.outInt) == 0 {
-			fmt.Println("OK")
-			return i, nil
-		}
+		i /= 2
+		break
 	}
-	// stage.Println(cmp)
-	// stage.Println(strings.Join(cmp.output, ","))
+	// Precision search
+	accuracy := 1
+	step := 1000000000
+	lastI := i
+	for ; i < MaxInt; i += step {
+		cmp.Reset()
+		cmp.Rg['A'] = i
+		for cmp.Step() {
+		}
+		stage.Println("prog", cmp.Prog, "out", cmp.outInt, accuracy-1, "/", len(cmp.Prog), i)
+		if len(cmp.outInt) > len(cmp.Prog) {
+			i = lastI
+			if step > 1 {
+				step /= 2
+			}
+			continue
+		}
+		if slices.Compare(cmp.Prog[len(cmp.Prog)-accuracy:], cmp.outInt[len(cmp.outInt)-accuracy:]) == 0 {
+			if accuracy == len(cmp.Prog) {
+				return i, nil
+			}
+			accuracy++
+			i = lastI
+			if step > 1 {
+				step /= 10
+			}
+			continue
+		}
+		// Comment to make it work on the example
+		lastI = i
+	}
 	return 0, nil
 }
