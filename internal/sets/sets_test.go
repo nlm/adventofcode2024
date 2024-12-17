@@ -72,3 +72,13 @@ func TestIterSet(t *testing.T) {
 		assert.Contains(t, s, v)
 	}
 }
+
+func TestClone(t *testing.T) {
+	a := make(Set[int])
+	a.Add(42)
+	b := a.Clone()
+	b.Add(43)
+	assert.True(t, b.Contains(42))
+	assert.False(t, a.Contains(43))
+	assert.True(t, b.Contains(43))
+}

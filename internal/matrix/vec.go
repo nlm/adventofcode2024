@@ -1,6 +1,9 @@
 package matrix
 
-import "fmt"
+import (
+	"fmt"
+	"slices"
+)
 
 type Vec XY
 
@@ -44,4 +47,18 @@ func (v Vec) String() string {
 // Inv returns the inverse of this vector
 func (v Vec) Inv() Vec {
 	return Vec{X: -v.X, Y: -v.Y}
+}
+
+// Rotates sort of rotates a well-known vector.
+// This is mathematically wrong, but is useful for AOC.
+func (v Vec) Rotate(deg int) Vec {
+	vecs := []Vec{Up, UpRight, Right, DownRight, Down, DownLeft, Left, UpLeft}
+	if deg%45 != 0 {
+		panic("deg must be a multiple of 45")
+	}
+	i := slices.Index(vecs, v)
+	if i < 0 {
+		panic("can only rotate a well-known vector")
+	}
+	return vecs[(i+(deg/45))%len(vecs)]
 }

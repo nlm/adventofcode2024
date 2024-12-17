@@ -6,6 +6,8 @@ import (
 	"iter"
 )
 
+// MustLines returns an iteator over the lines read from the io.Reader.
+// This version returns slices of bytes.
 func MustLinesBytes(r io.Reader) iter.Seq[[]byte] {
 	return func(yield func([]byte) bool) {
 		s := bufio.NewScanner(r)
@@ -20,6 +22,8 @@ func MustLinesBytes(r io.Reader) iter.Seq[[]byte] {
 	}
 }
 
+// MustLines returns an iteator over the lines read from the io.Reader.
+// This version returns strings.
 func MustLines(r io.Reader) iter.Seq[string] {
 	return func(yield func(string) bool) {
 		s := bufio.NewScanner(r)
@@ -34,6 +38,8 @@ func MustLines(r io.Reader) iter.Seq[string] {
 	}
 }
 
+// Map returns an iterator that outputs the result of the function f applied
+// to each item of the given Sequence.
 func Map[T1, T2 any](items iter.Seq[T1], f func(T1) T2) iter.Seq[T2] {
 	return func(yield func(T2) bool) {
 		for item := range items {
@@ -44,6 +50,8 @@ func Map[T1, T2 any](items iter.Seq[T1], f func(T1) T2) iter.Seq[T2] {
 	}
 }
 
+// Map returns a slice of which each items contains the result
+// of the function f applied to each item from the provided slice.
 func MapSlice[T1, T2 any](items []T1, f func(T1) T2) []T2 {
 	res := make([]T2, len(items))
 	for i := range len(items) {
@@ -52,6 +60,8 @@ func MapSlice[T1, T2 any](items []T1, f func(T1) T2) []T2 {
 	return res
 }
 
+// Filter returns an iteartor that outputs each item from the given
+// sequence that satisfy the condition "f(item) == true".
 func Filter[T1 any](items iter.Seq[T1], f func(T1) bool) iter.Seq[T1] {
 	return func(yield func(T1) bool) {
 		for item := range items {
@@ -64,6 +74,8 @@ func Filter[T1 any](items iter.Seq[T1], f func(T1) bool) iter.Seq[T1] {
 	}
 }
 
+// Filter returns a slice that contains all items from the given
+// slice that satisfy the condition "f(item) == true".
 func FilterSlice[T1 any](items []T1, f func(T1) bool) []T1 {
 	res := make([]T1, 0, len(items))
 	for _, item := range items {
