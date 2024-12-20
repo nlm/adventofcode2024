@@ -9,7 +9,7 @@ import (
 var Stage1TestCases = []stage.TestCase{
 	{
 		Name:   "input",
-		Result: 250,
+		Result: int64(250),
 	},
 }
 

@@ -7,8 +7,11 @@ import (
 
 	"github.com/nlm/adventofcode2024/internal/iterators"
 	"github.com/nlm/adventofcode2024/internal/matrix"
+	"github.com/nlm/adventofcode2024/internal/maze"
+	"github.com/nlm/adventofcode2024/internal/sets"
 	"github.com/nlm/adventofcode2024/internal/stage"
 	"github.com/nlm/adventofcode2024/internal/utils"
+	"gonum.org/v1/gonum/graph"
 	"gonum.org/v1/gonum/graph/path"
 	"gonum.org/v1/gonum/graph/simple"
 )
@@ -24,9 +27,9 @@ func ParseInput(input io.Reader, maxX, maxY int) (*matrix.Matrix[byte], []matrix
 	return m, coords
 }
 
-func Corrupt(m *matrix.Matrix[byte], coords []matrix.Coord, nbytes int) {
-	for i := range nbytes {
-		m.SetAtCoord(coords[i], '#')
+func Corrupt(m *matrix.Matrix[byte], coords []matrix.Coord) {
+	for _, c := range coords {
+		m.SetAtCoord(c, '#')
 	}
 }
 
@@ -49,16 +52,18 @@ func Stage1(input io.Reader) (any, error) {
 	}
 
 	m, coords := ParseInput(input, maxX, maxY)
-	Corrupt(m, coords, nCorr)
+	Corrupt(m, coords[:nCorr])
 	stage.Println(matrix.SMatrix(m))
 	stage.Println(coords)
 
 	start := matrix.Coord{X: 0, Y: 0}
 	end := matrix.Coord{X: maxX, Y: maxY}
-	return FindPath(m, start, end), nil
+	mz := maze.NewSimplePathFinder(m)
+	_, weight := mz.FindDijkstra(start, end)
+	return weight, nil
 }
 
-func FindPath(m *matrix.Matrix[byte], from, to matrix.Coord) int {
+func FindPath(m *matrix.Matrix[byte], from, to matrix.Coord) ([]graph.Node, int) {
 	g := simple.NewWeightedDirectedGraph(0, 0)
 	for c := range m.Coords() {
 		currNode, isNew := g.NodeWithID(CoordToId(c))
@@ -91,10 +96,10 @@ func FindPath(m *matrix.Matrix[byte], from, to matrix.Coord) int {
 			stage.Printf("end\ntotal : %.2f\n", weight)
 			stage.Println(matrix.SMatrix(vm))
 		}
-		return int(weight)
+		return sp, int(weight)
 	} else {
 		stage.Println("not found")
-		return -1
+		return nil, -1
 	}
 }
 
@@ -111,20 +116,33 @@ func Stage2(input io.Reader) (any, error) {
 	m, coords := ParseInput(input, maxX, maxY)
 	stage.Println(matrix.SMatrix(m))
 	stage.Println(coords)
+	Corrupt(m, coords[:nCorr])
+
+	// Initial search
+	start := matrix.Coord{X: 0, Y: 0}
+	end := matrix.Coord{X: maxX, Y: maxY}
+	sp, _ := FindPath(m, start, end)
+	spSet := make(sets.Set[matrix.Coord])
+	spSet.Add(iterators.MapSlice(sp, func(g graph.Node) matrix.Coord { return IdToCoord(g.ID()) })...)
 
 	for nC := nCorr; nC < len(coords); nC++ {
-		m2 := m.Clone()
-		Corrupt(m2, coords, nC)
+		newCoord := coords[nC]
+		m.SetAtCoord(newCoord, '#')
 
-		start := matrix.Coord{X: 0, Y: 0}
-		end := matrix.Coord{X: maxX, Y: maxY}
-		w := FindPath(m2, start, end)
+		// Skip recalculation
+		if !spSet.Contains(newCoord) {
+			continue
+		}
+
+		sp, w := FindPath(m, start, end)
 		stage.Println("->", nC, coords[nC-1])
 		if w < 0 {
-			c := coords[nC-1]
+			c := coords[nC]
 			return fmt.Sprintf("%d,%d", c.X, c.Y), nil
 		}
+		clear(spSet)
+		spSet.Add(iterators.MapSlice(sp, func(g graph.Node) matrix.Coord { return IdToCoord(g.ID()) })...)
 	}
 
-	return 0, nil
+	return nil, nil
 }
