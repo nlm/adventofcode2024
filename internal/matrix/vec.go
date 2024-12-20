@@ -39,6 +39,11 @@ func (v Vec) Mul(n int) Vec {
 	return Vec{X: v.X * n, Y: v.Y * n}
 }
 
+// Mul multiplies a vector by a factor of n.
+func (v Vec) Div(n int) Vec {
+	return Vec{X: v.X / n, Y: v.Y / n}
+}
+
 // String returns a string representation of Vec.
 func (v Vec) String() string {
 	return fmt.Sprintf("{X: %d, Y: %d}", v.X, v.Y)

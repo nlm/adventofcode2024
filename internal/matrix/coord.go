@@ -5,8 +5,7 @@ import (
 )
 
 type XY struct {
-	X int
-	Y int
+	X, Y int
 }
 
 type Coord XY
