@@ -13,24 +13,23 @@ const (
 	SymbolEmpty = '.'
 )
 
+// PathFinder helps find paths within a Matrix[byte].
 type PathFinder struct {
 	m *matrix.Matrix[byte]
 	g *simple.WeightedDirectedGraph
 }
 
+// CoordToId translates coordinates inside the matrix to a unique id.
 func CoordToId[T comparable](m *matrix.Matrix[T], c matrix.Coord) int64 {
-	// return int64(c.Y*m.Size.X + c.X)
-	return int64(1000*c.X + c.Y)
+	return int64(c.Y*m.Size.X + c.X)
 }
 
+// IdToCoord translates an previously generated id back to coordinates inside the matrix.
 func IdToCoord[T comparable](m *matrix.Matrix[T], id int64) matrix.Coord {
-	// return matrix.Coord{X: int(id % int64(m.Size.X)), Y: int(id / int64(m.Size.X))}
-	return matrix.Coord{
-		X: int(id / 1000),
-		Y: int(id % 1000),
-	}
+	return matrix.Coord{X: int(id % int64(m.Size.X)), Y: int(id / int64(m.Size.X))}
 }
 
+// NewSimplePathFinder creates a PathFinder
 func NewSimplePathFinder(m *matrix.Matrix[byte]) *PathFinder {
 	g := simple.NewWeightedDirectedGraph(0, 0)
 	for c := range m.Coords() {
@@ -56,6 +55,9 @@ func NewSimplePathFinder(m *matrix.Matrix[byte]) *PathFinder {
 	}
 }
 
+// AddSpecialNode adds a new node in the graph at coordinate c.
+// It will search all the reachable neightbors from this point and create path FROM it to these.
+// If invert is true, it will create path from all reachable neighbors TO this point.
 func (pf *PathFinder) AddSpecialNode(m *matrix.Matrix[byte], c matrix.Coord, invert bool) {
 	currNode, isNew := pf.g.NodeWithID(CoordToId(m, c))
 	if isNew {
@@ -77,6 +79,7 @@ func (pf *PathFinder) AddSpecialNode(m *matrix.Matrix[byte], c matrix.Coord, inv
 	}
 }
 
+// FindDijkstra uses the Dijkstra algorithm to find a shortest path from a coordinate to another.
 func (pf *PathFinder) FindDijkstra(from, to matrix.Coord) ([]matrix.Coord, int64) {
 	paths := path.DijkstraFrom(pf.g.Node(CoordToId(pf.m, from)), pf.g)
 	sp, w := paths.To(CoordToId(pf.m, to))
@@ -84,6 +87,19 @@ func (pf *PathFinder) FindDijkstra(from, to matrix.Coord) ([]matrix.Coord, int64
 	return spres, int64(w)
 }
 
+// FindDijkstra uses the Dijkstra algorithm to find all shortest paths from a coordinate to another.
+func (pf *PathFinder) FindAllDijkstra(from, to matrix.Coord) ([][]matrix.Coord, int64) {
+	paths := path.DijkstraAllFrom(pf.g.Node(CoordToId(pf.m, from)), pf.g)
+	sp, w := paths.AllTo(CoordToId(pf.m, to))
+	spres := iterators.MapSlice(sp, func(nodes []graph.Node) []matrix.Coord {
+		return iterators.MapSlice(nodes, func(node graph.Node) matrix.Coord {
+			return IdToCoord(pf.m, node.ID())
+		})
+	})
+	return spres, int64(w)
+}
+
+// Graph returns the underlying graph contained in the PathFinder.
 func (pf *PathFinder) Graph() *simple.WeightedDirectedGraph {
 	return pf.g
 }
