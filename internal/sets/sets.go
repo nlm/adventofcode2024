@@ -1,8 +1,10 @@
 package sets
 
 import (
+	"fmt"
 	"iter"
 	"maps"
+	"strings"
 )
 
 // Set is a collection of unique items.
@@ -22,6 +24,23 @@ func (s Set[T]) Add(values ...T) {
 	for _, v := range values {
 		s[v] = struct{}{}
 	}
+}
+
+func (s Set[T]) String() string {
+	b := strings.Builder{}
+	b.Grow(len(s) * 4)
+	first := true
+	b.WriteString("set{")
+	for k := range s {
+		if !first {
+			b.WriteString(" ")
+		} else {
+			first = false
+		}
+		b.WriteString(fmt.Sprint(k))
+	}
+	b.WriteString("}")
+	return b.String()
 }
 
 // Append is the same as Add, but it creates a new set if s is nil.

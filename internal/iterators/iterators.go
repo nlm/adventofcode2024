@@ -85,3 +85,47 @@ func FilterSlice[T1 any](items []T1, f func(T1) bool) []T1 {
 	}
 	return res
 }
+
+// All returns true if fn returns true for all of
+// the items contained in the slice.
+func All[T any](seq iter.Seq[T], fn func(T) bool) bool {
+	for elt := range seq {
+		if !fn(elt) {
+			return false
+		}
+	}
+	return true
+}
+
+// All returns true if fn returns true for all of
+// the items contained in the slice.
+func AllSlice[T any](slice []T, fn func(T) bool) bool {
+	for i := 0; i < len(slice); i++ {
+		if !fn(slice[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+// Any returns true if fn returns true for any of
+// the items produced by the iterator.
+func Any[T any](seq iter.Seq[T], fn func(T) bool) bool {
+	for elt := range seq {
+		if fn(elt) {
+			return true
+		}
+	}
+	return false
+}
+
+// Any returns true if fn returns true for any of
+// the items contained in the slice.
+func AnySlice[T any](slice []T, fn func(T) bool) bool {
+	for i := 0; i < len(slice); i++ {
+		if fn(slice[i]) {
+			return true
+		}
+	}
+	return false
+}
