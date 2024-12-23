@@ -10,7 +10,10 @@ var Stage1TestCases = []stage.TestCase{
 	{
 		Name:   "example",
 		Result: nil,
-		Err:    stage.ErrUnimplemented,
+	},
+	{
+		Name:   "input",
+		Result: nil,
 	},
 }
 
@@ -18,7 +21,10 @@ var Stage2TestCases = []stage.TestCase{
 	{
 		Name:   "example",
 		Result: nil,
-		Err:    stage.ErrUnimplemented,
+	},
+	{
+		Name:   "input",
+		Result: nil,
 	},
 }
 
